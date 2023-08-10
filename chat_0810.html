@@ -819,6 +819,10 @@ Messages
             value="0.5"
     /><span>更多样</span>
     </div>
+    <div class="controls-list">
+        <label for="chatKey">ChatGPT KEY:</label>
+        <input id="chatKey" name="key" />
+    </div>
 </div>
 <div class="chat-wrapper">
     <div class="chat">
@@ -851,22 +855,11 @@ Messages
     var submitButton = document.getElementById('submit');
     var submitHTML = submitButton.innerHTML;
 
-    document.getElementById('model').addEventListener('change', function () {
-        var selectedModel = this.value;
-
-        // 如果所选模型值以“http”开头
-        if (selectedModel.startsWith('http')) {
-            // 在新窗口中打开该URL
-            window.open(selectedModel, selectedModel);
-            this.selectedIndex = 0;
-        }
-    });
-
-
     document.getElementById('query-form').addEventListener('submit', function (event) {
         event.preventDefault();
         var prompt = promptTextBox.value;
         var model = document.getElementById('model').value;
+        var chatKey = document.getElementById('chatKey').value;
         var temperature = parseFloat(document.getElementById('temperature').value);
 
         // 检查所选模型值是否以“http”开头
@@ -922,7 +915,7 @@ Messages
         } else { // chatgpt
             messages.push({ role: 'user', content: prompt }) // Add user's input to messages array
             headers = {
-                'Authorization': 'Bearer ' + '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',
+                'Authorization': 'Bearer ' + chatKey,
                 'Content-Type': 'application/json'
             };
             body = JSON.stringify({
@@ -930,6 +923,7 @@ Messages
                 messages: messages,  // Send all the messages
                 temperature: temperature
             });
+            document.cookie = "chatKey=" + chatKey + "; expires=Thu, 18 Dec 2123 12:00:00 UTC; path=/";
         }
 
         submitButton.innerHTML = '<span class="">·</span><span class="">·</span><span class="invisible">·</span>'
@@ -993,7 +987,29 @@ Messages
         }
     }
 
+    function getCookie(name) {
+      var nameEQ = name + "=";
+      var ca = document.cookie.split(';');
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
+
     window.onload = function () {
+        document.getElementById('model').addEventListener('change', function () {
+            var selectedModel = this.value;
+
+            // 如果所选模型值以“http”开头
+            if (selectedModel.startsWith('http')) {
+                // 在新窗口中打开该URL
+                window.open(selectedModel, selectedModel);
+                this.selectedIndex = 0;
+            }
+        });
+        document.getElementById('chatKey').value = getCookie('chatKey');
         document.addEventListener('touchstart', function (event) {
             if (event.touches.length > 1) {
                 event.preventDefault();
