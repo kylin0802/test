@@ -38,9 +38,22 @@
         /*--------------------
 Chat
 --------------------*/
-        .controls-list {
-            margin-top: 10px;
-        }
+            .controls-list {
+                margin-top: 10px;
+                display: flex;
+                align-items: center;
+            }
+            .controls-list label {
+                padding-right: 4px;
+                width: 50px;
+            }
+            #model{
+                width: 200px;
+            }
+            #chatKey{
+                width: 300px;
+            }
+
         .chat-wrapper {
             height: 80px;
             width: 100%;
@@ -50,7 +63,7 @@ Chat
         }
 
         .chat {
-            margin-top: 130px;
+            margin-top: 142px;
             /* left: 50%; */
             /* transform: translate(-50%, -50%); */
             width: 300px;
@@ -821,7 +834,7 @@ Messages
     </div>
     <div class="controls-list">
         <label for="chatKey">ChatGPT KEY:</label>
-        <input id="chatKey" name="key" />
+        <textarea id="chatKey" rows="3" name="key"> </textarea>
     </div>
 </div>
 <div class="chat-wrapper">
