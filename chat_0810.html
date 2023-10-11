@@ -815,7 +815,7 @@ Messages
             <option value="gpt-3.5-turbo-16k">gpt-3.5-turbo-16k(长文本)</option>
             <option value="qwen-v1">阿里-通义千问 qwen-v1</option>
             <option value="qwen-plus-v1">阿里-通义千问 qwen-plus-v1</option>
-<!--            <option value="ERNIE-Bot-turbo">百度-文心一言 ERNIE-Bot-turbo</option>-->
+            <option value="ERNIE-Bot-turbo">百度-文心一言 ERNIE-Bot-turbo</option>
 <!--            <option value="https://xinghuo.xfyun.cn/desk">讯飞-星火</option>-->
         </select>
     </div>
@@ -867,6 +867,9 @@ Messages
     var conversationDiv = document.getElementById('conversation');
     var submitButton = document.getElementById('submit');
     var submitHTML = submitButton.innerHTML;
+    const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('请求超时')), 500000)
+    );
 
     document.getElementById('query-form').addEventListener('submit', function (event) {
         event.preventDefault();
@@ -941,11 +944,14 @@ Messages
 
         submitButton.innerHTML = '<span class="">·</span><span class="">·</span><span class="invisible">·</span>'
         submitButton.disabled = true;
-        fetch(url, {
-            method: 'POST',
-            headers: headers,
-            body: body
-        })
+        Promise.race([
+            fetch(url, {
+                method: 'POST',
+                headers: headers,
+                body: body
+            }),
+            timeoutPromise
+        ])
         .then(response => {
             if (!response.ok) {
                 // 如果HTTP状态代码表示错误，则抛出错误
@@ -958,7 +964,13 @@ Messages
         })
         .catch(error => {
             // 这里处理任何的错误
-            alert("发生错误: " + JSON.stringify(error));
+            let errorMessage;
+            if (error.message) {
+                errorMessage = error.message;
+            } else {
+                errorMessage = JSON.stringify(error);
+            }
+            alert("发生错误: " + errorMessage);
             throw error;
         })
         .finally(() => {
